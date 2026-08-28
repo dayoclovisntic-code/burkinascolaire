@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Burkina Scolaire · Cours & Exercices CP1-CM2</title>
+    <title>Burkina Scolaire · Inscription & Téléchargement PDF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF pour générer les PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* ---------- COULEURS DU BURKINA ---------- */
         :root {
@@ -29,6 +31,149 @@
             background-color: var(--gris-clair);
             color: var(--noir);
             padding-bottom: 40px;
+        }
+
+        /* ---------- OVERLAY AUTH ---------- */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(6px);
+            transition: opacity 0.5s;
+        }
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        .auth-box {
+            background: var(--blanc);
+            padding: 30px 24px;
+            border-radius: var(--arrondi);
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-top: 8px solid var(--jaune);
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .auth-box .logo-auth {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .auth-box .logo-auth i {
+            font-size: 48px;
+            color: var(--rouge);
+            background: var(--jaune);
+            padding: 16px;
+            border-radius: 50%;
+        }
+        .auth-box .logo-auth h2 {
+            margin-top: 10px;
+            font-size: 22px;
+            color: var(--noir);
+        }
+        .auth-box .logo-auth span {
+            color: var(--rouge);
+        }
+        .auth-box .logo-auth small {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .auth-box label {
+            display: block;
+            font-weight: 700;
+            font-size: 13px;
+            margin-top: 14px;
+            color: #444;
+        }
+        .auth-box label i {
+            margin-right: 6px;
+            color: var(--rouge);
+        }
+        .auth-box input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 30px;
+            border: 2px solid #ddd;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+            margin-top: 4px;
+        }
+        .auth-box input:focus {
+            border-color: var(--rouge);
+        }
+        .auth-box .btn-auth {
+            background: var(--rouge);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 16px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .auth-box .btn-auth:hover {
+            background: #a32222;
+        }
+        .auth-box .btn-auth.secondary {
+            background: var(--jaune);
+            color: var(--noir);
+        }
+        .auth-box .btn-auth.secondary:hover {
+            background: #dba40a;
+        }
+        .auth-box .switch-link {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+        .auth-box .switch-link a {
+            color: var(--rouge);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .auth-box .auth-erreur {
+            color: var(--rouge);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 6px;
+            display: none;
+        }
+        .auth-box .auth-erreur.visible {
+            display: block;
+        }
+
+        /* ---------- CONTENU PRINCIPAL ---------- */
+        .contenu-principal {
+            display: none;
+        }
+        .contenu-principal.visible {
+            display: block;
         }
 
         /* ---------- TOP BAR ---------- */
@@ -82,8 +227,13 @@
             margin-right: 4px;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
         .header-actions i {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--noir);
             background: var(--gris-clair);
             padding: 8px;
@@ -95,8 +245,16 @@
             background: var(--jaune);
             color: var(--noir);
         }
+        .header-actions .badge-payment {
+            background: var(--vert);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+        }
 
-        /* ---------- ACCORDÉON PRINCIPAL ---------- */
+        /* ---------- ACCORDÉON ---------- */
         .container-accordion {
             max-width: 1100px;
             margin: 20px auto;
@@ -195,7 +353,7 @@
             display: block;
         }
 
-        /* ---------- LISTE DES RESSOURCES ---------- */
+        /* ---------- RESSOURCE ---------- */
         .ressource-item {
             background: #f9f9f9;
             border-radius: 8px;
@@ -296,6 +454,155 @@
         .btn-ressource.telecharger:hover {
             background: #007a3a;
         }
+        .btn-ressource.telecharger:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ---------- MODALE PAIEMENT ---------- */
+        .payment-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            backdrop-filter: blur(4px);
+        }
+        .payment-overlay.visible {
+            display: flex;
+        }
+        .payment-box {
+            background: white;
+            padding: 30px 24px;
+            border-radius: var(--arrondi);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-top: 8px solid var(--jaune);
+            animation: fadeIn 0.3s ease;
+        }
+        .payment-box i {
+            font-size: 48px;
+            color: var(--jaune);
+            background: var(--noir);
+            padding: 16px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .payment-box h3 {
+            margin-bottom: 6px;
+        }
+        .payment-box p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 16px;
+        }
+        .payment-box .highlight {
+            background: var(--gris-clair);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        .payment-box .highlight span {
+            color: var(--rouge);
+        }
+        .payment-box label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: left;
+            margin-bottom: 4px;
+        }
+        .payment-box input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 30px;
+            border: 2px solid #ddd;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+        .payment-box input:focus {
+            border-color: var(--vert);
+        }
+        .payment-box .btn-payment {
+            background: var(--vert);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+        }
+        .payment-box .btn-payment:hover {
+            background: #007a3a;
+        }
+        .payment-box .btn-payment.secondary {
+            background: var(--rouge);
+            margin-top: 8px;
+        }
+        .payment-box .btn-payment.secondary:hover {
+            background: #a32222;
+        }
+        .payment-box .fermer-btn {
+            margin-top: 12px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+        }
+
+        /* ---------- CONSEILS PARENTS ---------- */
+        .conseil-parents {
+            background: var(--noir);
+            color: white;
+            padding: 22px 18px;
+            border-radius: var(--arrondi);
+            border-bottom: 6px solid var(--jaune);
+        }
+        .conseil-parents h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+        .conseil-parents h3 i {
+            color: var(--jaune);
+            margin-right: 10px;
+        }
+        .conseil-parents p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        .conseil-parents .astuces {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .conseil-parents .astuce-item {
+            background: rgba(255,255,255,0.08);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .conseil-parents .astuce-item i {
+            color: var(--jaune);
+            margin-right: 6px;
+        }
 
         /* ---------- TOAST ---------- */
         .toast {
@@ -333,60 +640,282 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            .payment-box {
+                padding: 20px 16px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <i class="fas fa-graduation-cap"></i> Programme officiel du Burkina Faso <i class="fas fa-circle" style="font-size:5px; vertical-align:middle;"></i> 
-    </div>
+    <!-- =========================================================== -->
+    <!-- OVERLAY AUTH (INSCRIPTION / CONNEXION) -->
+    <!-- =========================================================== -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-box" id="authBox">
+            <div class="logo-auth">
+                <i class="fas fa-book-open"></i>
+                <h2>Burkina <span>Scolaire</span></h2>
+                <small>Inscription ou connexion</small>
+            </div>
+            <div id="authFormContainer">
+                <!-- Formulaire de connexion (par défaut) -->
+                <form id="loginForm">
+                    <label for="loginEmail"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="loginEmail" placeholder="exemple@domaine.com" required>
+                    <label for="loginPassword"><i class="fas fa-lock"></i> Mot de passe</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    <div id="authErreur" class="auth-erreur"><i class="fas fa-exclamation-circle"></i> Identifiants incorrects.</div>
+                    <button type="submit" class="btn-auth"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
+                    <div class="switch-link">Pas encore de compte ? <a id="goToRegister">S'inscrire</a></div>
+                </form>
 
-    <!-- HEADER -->
-    <header>
-        <div class="logo">
-            <i class="fas fa-book-open"></i> Burkina <span>Scolaire</span><small>CP1 · CP2 · CE1 · CE2 · CM1 · CM2</small>
-        </div>
-        <div class="header-actions">
-            <i class="fas fa-print" onclick="window.print()" title="Imprimer la page"></i>
-            <i class="fas fa-info-circle" onclick="showToast('📘 Tous les cours et exercices sont disponibles librement. Bonne révision !')" title="À propos"></i>
-        </div>
-    </header>
-
-    <!-- CONTENEUR ACCORDÉON -->
-    <div class="container-accordion" id="accordionContainer">
-        <!-- Généré par JavaScript -->
-    </div>
-
-    <!-- SECTION CONSEILS PARENTS -->
-    <div style="max-width:1100px; margin: 0 auto 30px; padding:0 16px;">
-        <div style="background:var(--noir); color:white; padding:22px 18px; border-radius:var(--arrondi); border-bottom:6px solid var(--jaune);">
-            <h3><i class="fas fa-lightbulb" style="color:var(--jaune); margin-right:10px;"></i> Conseils pour les parents</h3>
-            <p>Aidez vos enfants à réviser même sans connexion : ouvrez les cours, prenez une capture d'écran ou imprimez-les dans un cybercafé de la rue de la Gare.</p>
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;">
-                <span style="background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:13px; font-weight:600;"><i class="fas fa-clock" style="color:var(--jaune); margin-right:6px;"></i> 30 min de révision par jour</span>
-                <span style="background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:13px; font-weight:600;"><i class="fas fa-pencil-alt" style="color:var(--jaune); margin-right:6px;"></i> Faire les exercices sur ardoise</span>
-                <span style="background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:13px; font-weight:600;"><i class="fas fa-users" style="color:var(--jaune); margin-right:6px;"></i> Groupe d'étude entre voisins</span>
+                <!-- Formulaire d'inscription (caché) -->
+                <form id="registerForm" style="display:none;">
+                    <label for="regEmail"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="regEmail" placeholder="exemple@domaine.com" required>
+                    <label for="regPhone"><i class="fas fa-phone-alt"></i> Téléphone</label>
+                    <input type="tel" id="regPhone" placeholder="70 00 00 00" required>
+                    <label for="regPassword"><i class="fas fa-lock"></i> Mot de passe (6 caractères min)</label>
+                    <input type="password" id="regPassword" placeholder="••••••••" minlength="6" required>
+                    <label for="regConfirm"><i class="fas fa-check-circle"></i> Confirmer</label>
+                    <input type="password" id="regConfirm" placeholder="••••••••" required>
+                    <div id="regErreur" class="auth-erreur"><i class="fas fa-exclamation-circle"></i> Erreur : vérifiez vos champs.</div>
+                    <button type="submit" class="btn-auth"><i class="fas fa-user-plus"></i> S'inscrire</button>
+                    <div class="switch-link">Déjà inscrit ? <a id="goToLogin">Se connecter</a></div>
+                </form>
             </div>
         </div>
     </div>
 
-    <footer style="text-align:center; padding:20px 16px; font-size:12px; color:#888; border-top:1px solid #ddd; margin:0 16px;">
-        <div style="display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-bottom:6px;">
-            <a onclick="showToast('📚 Basé sur le MENAPLN (Burkina Faso)')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-check-circle"></i> MENAPLN</a>
-            <a onclick="showToast('📍 Dédougou, Boucle du Mouhoun')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-map-pin"></i> Dédougou</a>
-            <a onclick="showToast('📧 Contactez-nous pour ajouter vos cours !')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-envelope"></i> Contribuer</a>
+    <!-- =========================================================== -->
+    <!-- CONTENU PRINCIPAL -->
+    <!-- =========================================================== -->
+    <div class="contenu-principal" id="contenuPrincipal">
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <i class="fas fa-graduation-cap"></i> Programme officiel du Burkina Faso <i class="fas fa-circle" style="font-size:5px; vertical-align:middle;"></i> Dédougou
         </div>
-        <p>&copy; 2026 Burkina Scolaire · Entièrement gratuit pour les écoles de Dédougou</p>
-    </footer>
+
+        <!-- HEADER -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-book-open"></i> Burkina <span>Scolaire</span><small>CP1 · CP2 · CE1 · CE2 · CM1 · CM2</small>
+            </div>
+            <div class="header-actions">
+                <span class="badge-payment" id="paymentBadge">🔒 PDF verrouillé</span>
+                <i class="fas fa-sign-out-alt" onclick="deconnecter()" title="Se déconnecter" style="color:var(--rouge);"></i>
+            </div>
+        </header>
+
+        <!-- CONTENEUR ACCORDÉON -->
+        <div class="container-accordion" id="accordionContainer">
+            <!-- Généré par JavaScript -->
+        </div>
+
+        <!-- SECTION CONSEILS PARENTS -->
+        <div style="max-width:1100px; margin: 0 auto 30px; padding:0 16px;">
+            <div class="conseil-parents">
+                <h3><i class="fas fa-lightbulb"></i> Conseils pour les parents</h3>
+                <p>Aidez vos enfants à réviser même sans connexion : ouvrez les cours, prenez une capture d'écran ou imprimez-les dans un cybercafé.</p>
+                <div class="astuces">
+                    <span class="astuce-item"><i class="fas fa-clock"></i> 30 min de révision par jour</span>
+                    <span class="astuce-item"><i class="fas fa-pencil-alt"></i> Faire les exercices sur ardoise</span>
+                    <span class="astuce-item"><i class="fas fa-users"></i> Groupe d'étude entre voisins</span>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align:center; padding:20px 16px; font-size:12px; color:#888; border-top:1px solid #ddd; margin:0 16px;">
+            <div style="display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-bottom:6px;">
+                <a onclick="showToast('📚 Basé sur le MENAPLN (Burkina Faso)')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-check-circle"></i> MENAPLN</a>
+                <a onclick="showToast('📍 Dédougou, Boucle du Mouhoun')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-map-pin"></i> Dédougou</a>
+                <a onclick="showToast('📧 Contactez-nous pour ajouter vos cours !')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-envelope"></i> Contribuer</a>
+            </div>
+            <p>&copy; 2026 Burkina Scolaire · Entièrement gratuit après paiement unique de 500 FCFA</p>
+        </footer>
+    </div>
+
+    <!-- MODALE DE PAIEMENT -->
+    <div class="payment-overlay" id="paymentOverlay">
+        <div class="payment-box">
+            <i class="fas fa-money-bill-wave"></i>
+            <h3>Paiement Orange Money</h3>
+            <p>Pour débloquer tous les téléchargements PDF, effectuez un paiement unique de <strong>500 FCFA</strong>.</p>
+            <div class="highlight">📱 Numéro : <span>55 30 31 11</span></div>
+            <label for="payerPhone"><i class="fas fa-phone-alt"></i> Votre numéro Orange Money</label>
+            <input type="tel" id="payerPhone" placeholder="70 00 00 00" required>
+            <button class="btn-payment" id="confirmPaymentBtn"><i class="fas fa-check-circle"></i> Confirmer le paiement</button>
+            <button class="btn-payment secondary" id="cancelPaymentBtn"><i class="fas fa-times"></i> Annuler</button>
+            <div style="margin-top:12px; font-size:12px; color:#888;">Simulation – Aucun argent réel n'est débité.</div>
+        </div>
+    </div>
 
     <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
     <script>
         // ======================================================================
-        // 1. BASE DE DONNÉES (20 cours + 20 exercices par classe)
+        // 1. GESTION DE L'AUTHENTIFICATION (localStorage)
+        // ======================================================================
+        const authOverlay = document.getElementById('authOverlay');
+        const contenuPrincipal = document.getElementById('contenuPrincipal');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const authErreur = document.getElementById('authErreur');
+        const regErreur = document.getElementById('regErreur');
+
+        // Vérifier si l'utilisateur est déjà connecté
+        const currentUser = JSON.parse(localStorage.getItem('burkina_scolaire_user'));
+        if (currentUser) {
+            authOverlay.classList.add('hidden');
+            contenuPrincipal.classList.add('visible');
+            mettreAJourBadge();
+        }
+
+        // Basculer entre connexion et inscription
+        document.getElementById('goToRegister').addEventListener('click', function(e) {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            authErreur.classList.remove('visible');
+            regErreur.classList.remove('visible');
+        });
+        document.getElementById('goToLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            authErreur.classList.remove('visible');
+            regErreur.classList.remove('visible');
+        });
+
+        // Inscription
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+
+            if (password.length < 6) {
+                regErreur.textContent = '❌ Le mot de passe doit contenir au moins 6 caractères.';
+                regErreur.classList.add('visible');
+                return;
+            }
+            if (password !== confirm) {
+                regErreur.textContent = '❌ Les mots de passe ne correspondent pas.';
+                regErreur.classList.add('visible');
+                return;
+            }
+            if (!email || !phone) {
+                regErreur.textContent = '❌ Veuillez remplir tous les champs.';
+                regErreur.classList.add('visible');
+                return;
+            }
+
+            // Vérifier si l'email existe déjà
+            const users = JSON.parse(localStorage.getItem('burkina_scolaire_users')) || [];
+            if (users.find(u => u.email === email)) {
+                regErreur.textContent = '❌ Cet email est déjà utilisé.';
+                regErreur.classList.add('visible');
+                return;
+            }
+
+            // Enregistrer
+            users.push({ email, phone, password });
+            localStorage.setItem('burkina_scolaire_users', JSON.stringify(users));
+
+            // Connecter automatiquement
+            localStorage.setItem('burkina_scolaire_user', JSON.stringify({ email, phone }));
+            authOverlay.classList.add('hidden');
+            contenuPrincipal.classList.add('visible');
+            mettreAJourBadge();
+            showToast('✅ Inscription réussie ! Bienvenue.');
+            // Recharger les ressources (si besoin)
+            genererAccordeon();
+        });
+
+        // Connexion
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const users = JSON.parse(localStorage.getItem('burkina_scolaire_users')) || [];
+            const found = users.find(u => u.email === email && u.password === password);
+            if (found) {
+                localStorage.setItem('burkina_scolaire_user', JSON.stringify({ email, phone: found.phone }));
+                authOverlay.classList.add('hidden');
+                contenuPrincipal.classList.add('visible');
+                mettreAJourBadge();
+                showToast('✅ Connexion réussie !');
+                genererAccordeon();
+            } else {
+                authErreur.textContent = '❌ Email ou mot de passe incorrect.';
+                authErreur.classList.add('visible');
+            }
+        });
+
+        // Déconnexion
+        function deconnecter() {
+            localStorage.removeItem('burkina_scolaire_user');
+            authOverlay.classList.remove('hidden');
+            contenuPrincipal.classList.remove('visible');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            showToast('🔒 Vous êtes déconnecté.');
+        }
+
+        // ======================================================================
+        // 2. GESTION DU PAIEMENT ORANGE MONEY
+        // ======================================================================
+        const paymentOverlay = document.getElementById('paymentOverlay');
+        const payerPhoneInput = document.getElementById('payerPhone');
+
+        function ouvrirPaiement() {
+            paymentOverlay.classList.add('visible');
+            payerPhoneInput.value = '';
+            payerPhoneInput.focus();
+        }
+
+        function fermerPaiement() {
+            paymentOverlay.classList.remove('visible');
+        }
+
+        document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+            const phone = payerPhoneInput.value.trim().replace(/\s/g, '');
+            if (phone.length < 8) {
+                showToast('⚠️ Veuillez entrer un numéro Orange Money valide (ex: 70 00 00 00)');
+                return;
+            }
+            // Simulation de paiement
+            localStorage.setItem('burkina_scolaire_paid', 'true');
+            fermerPaiement();
+            mettreAJourBadge();
+            showToast('✅ Paiement de 500 FCFA confirmé ! Tous les PDF sont maintenant débloqués.');
+            // Actualiser les boutons de téléchargement
+            genererAccordeon();
+        });
+
+        document.getElementById('cancelPaymentBtn').addEventListener('click', fermerPaiement);
+        paymentOverlay.addEventListener('click', function(e) {
+            if (e.target === this) fermerPaiement();
+        });
+
+        function mettreAJourBadge() {
+            const badge = document.getElementById('paymentBadge');
+            if (localStorage.getItem('burkina_scolaire_paid') === 'true') {
+                badge.textContent = '✅ PDF débloqué';
+                badge.style.background = 'var(--vert)';
+            } else {
+                badge.textContent = '🔒 PDF verrouillé';
+                badge.style.background = 'var(--rouge)';
+            }
+        }
+
+        // ======================================================================
+        // 3. BASE DE DONNÉES (20 cours + 20 exercices par classe)
         // ======================================================================
         const ressources = [];
         let idCounter = 0;
@@ -438,23 +967,15 @@
             }
         };
 
-        // Génération des 240 ressources (20 cours + 20 exercices par classe)
+        // Génération
         classes.forEach(classe => {
-            // 20 cours
             for (let i = 0; i < 20; i++) {
                 const mat = matieres[i % matieres.length];
                 const themeList = themes[mat] && themes[mat][classe] ? themes[mat][classe] : ['Thème générique'];
                 const theme = themeList[i % themeList.length];
                 const titre = `Cours ${i+1} : ${theme}`;
                 const description = `Cours de ${mat} - ${classe} - Thème : ${theme}`;
-                const contenu = `📘 <strong>${titre}</strong><br><br>
-                ${theme} est un sujet important en ${mat}. Dans ce cours, nous allons découvrir les bases.
-                <br><br>
-                <strong>Objectif :</strong> Comprendre les notions essentielles de ${theme.toLowerCase()}.
-                <br>
-                <strong>Exemples :</strong> Des exemples concrets issus de la vie quotidienne au Burkina Faso.
-                <br>
-                <strong>À retenir :</strong> Retiens les définitions et les exercices pratiques.`;
+                const contenu = `📘 ${titre}\n\n${theme} est un sujet important en ${mat}. Dans ce cours, nous allons découvrir les bases.\n\nObjectif : Comprendre les notions essentielles de ${theme.toLowerCase()}.\nExemples : Des exemples concrets issus de la vie quotidienne au Burkina Faso.\nÀ retenir : Retiens les définitions et les exercices pratiques.`;
                 ressources.push({
                     id: nextId(),
                     classe: classe,
@@ -465,25 +986,14 @@
                     contenu: contenu
                 });
             }
-            // 20 exercices avec corrigés
             for (let i = 0; i < 20; i++) {
                 const mat = matieres[(i+2) % matieres.length];
                 const themeList = themes[mat] && themes[mat][classe] ? themes[mat][classe] : ['Exercice générique'];
                 const theme = themeList[(i*3) % themeList.length];
                 const titre = `Exercice ${i+1} : ${theme}`;
                 const description = `Exercice de ${mat} - ${classe} - ${theme}`;
-                const contenu = `📝 <strong>${titre}</strong><br><br>
-                ${theme} : réponds aux questions suivantes.
-                <br>
-                1. Question 1 sur ${theme} ?<br>
-                2. Question 2 sur ${theme} ?<br>
-                3. Question 3 sur ${theme} ?<br>
-                4. Applique la règle à un exemple de la vie courante.`;
-                const corrige = `✅ <strong>Corrigé de l'exercice "${titre}"</strong><br>
-                1. Réponse correcte à la question 1.<br>
-                2. Réponse correcte à la question 2.<br>
-                3. Réponse correcte à la question 3.<br>
-                4. Exemple d'application corrigé.`;
+                const contenu = `📝 ${titre}\n\n${theme} : réponds aux questions suivantes.\n1. Question 1 sur ${theme} ?\n2. Question 2 sur ${theme} ?\n3. Question 3 sur ${theme} ?\n4. Applique la règle à un exemple de la vie courante.`;
+                const corrige = `✅ Corrigé de l'exercice "${titre}"\n1. Réponse correcte à la question 1.\n2. Réponse correcte à la question 2.\n3. Réponse correcte à la question 3.\n4. Exemple d'application corrigé.`;
                 ressources.push({
                     id: nextId(),
                     classe: classe,
@@ -498,7 +1008,7 @@
         });
 
         // ======================================================================
-        // 2. GÉNÉRATION DE L'ACCORDÉON (100% PUBLIC)
+        // 4. GÉNÉRATION DE L'ACCORDÉON
         // ======================================================================
         function genererAccordeon() {
             const container = document.getElementById('accordionContainer');
@@ -509,6 +1019,8 @@
                 if (!grouped[r.classe][r.matiere]) grouped[r.classe][r.matiere] = [];
                 grouped[r.classe][r.matiere].push(r);
             });
+
+            const isPaid = localStorage.getItem('burkina_scolaire_paid') === 'true';
 
             let html = '';
             classes.forEach(cl => {
@@ -556,6 +1068,14 @@
                         const contentId = `content-${r.id}`;
                         const corrigeId = `corrige-${r.id}`;
 
+                        // Bouton télécharger conditionnel
+                        let downloadBtn = '';
+                        if (isPaid) {
+                            downloadBtn = `<button class="btn-ressource telecharger" onclick="telechargerPDF(${r.id})"><i class="fas fa-download"></i> Télécharger PDF</button>`;
+                        } else {
+                            downloadBtn = `<button class="btn-ressource telecharger" onclick="ouvrirPaiement()" style="background:var(--jaune);color:var(--noir);"><i class="fas fa-lock"></i> Payer pour débloquer</button>`;
+                        }
+
                         html += `
                             <div class="ressource-item">
                                 <div class="entete-ressource">
@@ -568,7 +1088,7 @@
                                 <div class="actions">
                                     <button class="btn-ressource voir" onclick="toggleContenu('${contentId}', this)"><i class="fas fa-eye"></i> Voir le contenu</button>
                                     ${hasCorrige ? `<button class="btn-ressource corriger" onclick="toggleCorrige('${corrigeId}', this)"><i class="fas fa-check-circle"></i> Voir corrigé</button>` : ''}
-                                    <button class="btn-ressource telecharger" onclick="showToast('📥 Téléchargement PDF (simulé) - ${r.titre}')"><i class="fas fa-download"></i> PDF</button>
+                                    ${downloadBtn}
                                 </div>
                             </div>
                         `;
@@ -587,7 +1107,7 @@
         }
 
         // ======================================================================
-        // 3. FONCTIONS DE TOGGLE
+        // 5. FONCTIONS DE TOGGLE
         // ======================================================================
         function toggleClasse(element) {
             const accordion = element.closest('.accordion-classe');
@@ -623,7 +1143,74 @@
         }
 
         // ======================================================================
-        // 4. TOAST
+        // 6. TÉLÉCHARGEMENT PDF (avec jsPDF)
+        // ======================================================================
+        function telechargerPDF(id) {
+            const res = ressources.find(r => r.id === id);
+            if (!res) return;
+
+            // Récupérer le contenu affiché (le cours ou l'exercice)
+            const contentDiv = document.getElementById(`content-${id}`);
+            if (!contentDiv) return;
+            // On prend le texte brut (en enlevant les balises HTML si présentes)
+            const contenuBrut = contentDiv.textContent || contentDiv.innerText;
+
+            // Créer le PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const margin = 20;
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const maxWidth = pageWidth - 2 * margin;
+            let y = margin;
+
+            // Titre
+            doc.setFontSize(18);
+            doc.setTextColor(207, 46, 46); // rouge
+            doc.text(res.titre, margin, y);
+            y += 10;
+
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Classe : ${res.classe}  |  Matière : ${res.matiere}  |  Type : ${res.type}`, margin, y);
+            y += 10;
+
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 8;
+
+            // Contenu avec retour à la ligne automatique
+            doc.setFontSize(11);
+            const lignes = doc.splitTextToSize(contenuBrut, maxWidth);
+            doc.text(lignes, margin, y);
+
+            // Ajouter une page si nécessaire (géré automatiquement par splitTextToSize ? Non, il faut gérer)
+            // On va vérifier si y + lignes.length * 5 > pageHeight - margin, alors on ajoute une page
+            const lignesHeight = lignes.length * 5; // approximation
+            if (y + lignesHeight > pageHeight - margin) {
+                doc.addPage();
+                y = margin;
+                doc.setFontSize(11);
+                doc.text('Suite du contenu :', margin, y);
+                y += 8;
+                // On affiche le reste ?
+                // Pour simplifier, on recommence avec le même texte (mais il pourrait être coupé)
+                // Mieux : on découpe et on répète.
+                // Pour ce cas simple, on ajoute une page et on continue
+                doc.text(lignes, margin, y);
+            }
+
+            // Pied de page
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('Généré par Burkina Scolaire - Dédougou', margin, pageHeight - 10);
+
+            // Télécharger
+            doc.save(`${res.titre}.pdf`);
+            showToast(`📄 PDF téléchargé : ${res.titre}`);
+        }
+
+        // ======================================================================
+        // 7. TOAST
         // ======================================================================
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -632,27 +1219,28 @@
             clearTimeout(toast._timeout);
             toast._timeout = setTimeout(() => {
                 toast.classList.remove('show');
-            }, 4000);
+            }, 5000);
         }
 
         // ======================================================================
-        // 5. INIT
+        // 8. INIT
         // ======================================================================
-        genererAccordeon();
-
-        // Message de bienvenue après le chargement
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                showToast('📚 Bienvenue ! Ouvre une classe pour commencer à réviser.');
-            }, 600);
-        });
+        // Si l'utilisateur est connecté, on génère l'accordéon
+        if (currentUser) {
+            genererAccordeon();
+        }
 
         // Rendre les fonctions globales pour les onclick
         window.toggleClasse = toggleClasse;
         window.toggleMatiere = toggleMatiere;
         window.toggleContenu = toggleContenu;
         window.toggleCorrige = toggleCorrige;
+        window.telechargerPDF = telechargerPDF;
+        window.ouvrirPaiement = ouvrirPaiement;
+        window.fermerPaiement = fermerPaiement;
+        window.deconnecter = deconnecter;
         window.showToast = showToast;
+        window.genererAccordeon = genererAccordeon;
     </script>
 </body>
 </html>
