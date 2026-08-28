@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Burkina Scolaire · Cours & Exercices CP1-CM2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- COULEURS DU BURKINA ---------- */
+        :root {
+            --rouge: #CF2E2E;
+            --vert: #009E49;
+            --jaune: #F5B81A;
+            --noir: #1e1e2a;
+            --gris-clair: #f4f7fa;
+            --blanc: #ffffff;
+            --ombre: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --arrondi: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--gris-clair);
+            color: var(--noir);
+            padding-bottom: 40px;
+        }
+
+        /* ---------- TOP BAR ---------- */
+        .top-bar {
+            background: var(--noir);
+            color: var(--jaune);
+            padding: 6px 12px;
+            font-size: 11px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .top-bar i {
+            color: var(--vert);
+            margin: 0 4px;
+        }
+
+        /* ---------- HEADER ---------- */
+        header {
+            background: var(--blanc);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--rouge);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--ombre);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--noir);
+        }
+        .logo span {
+            color: var(--rouge);
+        }
+        .logo small {
+            font-size: 10px;
+            font-weight: 400;
+            color: #666;
+            display: block;
+            margin-top: -4px;
+            letter-spacing: 1px;
+        }
+        .logo i {
+            color: var(--jaune);
+            margin-right: 4px;
+        }
+
+        .header-actions i {
+            font-size: 20px;
+            color: var(--noir);
+            background: var(--gris-clair);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .header-actions i:hover {
+            background: var(--jaune);
+            color: var(--noir);
+        }
+
+        /* ---------- ACCORDÉON PRINCIPAL ---------- */
+        .container-accordion {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+
+        .accordion-classe {
+            background: var(--blanc);
+            border-radius: var(--arrondi);
+            margin-bottom: 16px;
+            box-shadow: var(--ombre);
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .accordion-classe > .titre-classe {
+            background: var(--rouge);
+            color: white;
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .accordion-classe > .titre-classe:hover {
+            background: #a32222;
+        }
+        .accordion-classe > .titre-classe i:first-child {
+            margin-right: 12px;
+            transition: transform 0.3s ease;
+        }
+        .accordion-classe > .titre-classe .badge-count {
+            background: var(--jaune);
+            color: var(--noir);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .accordion-classe .contenu-classe {
+            display: none;
+            padding: 12px 16px 16px;
+            background: #fafafa;
+        }
+        .accordion-classe.open .contenu-classe {
+            display: block;
+        }
+
+        /* ---------- SOUS-ACCORDÉON MATIÈRE ---------- */
+        .accordion-matiere {
+            background: white;
+            border-radius: var(--arrondi);
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+        }
+        .accordion-matiere > .titre-matiere {
+            background: var(--gris-clair);
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--noir);
+            transition: 0.2s;
+            user-select: none;
+            border-radius: var(--arrondi) var(--arrondi) 0 0;
+        }
+        .accordion-matiere > .titre-matiere:hover {
+            background: #e8e8e8;
+        }
+        .accordion-matiere > .titre-matiere i {
+            margin-right: 10px;
+            color: var(--rouge);
+        }
+        .accordion-matiere > .titre-matiere .badge-count {
+            background: var(--vert);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+        }
+
+        .accordion-matiere .contenu-matiere {
+            display: none;
+            padding: 12px 16px;
+            border-top: 1px solid #eee;
+        }
+        .accordion-matiere.open .contenu-matiere {
+            display: block;
+        }
+
+        /* ---------- LISTE DES RESSOURCES ---------- */
+        .ressource-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--jaune);
+        }
+        .ressource-item .entete-ressource {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .ressource-item .badge-type {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .ressource-item .badge-type.cours {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+        .ressource-item .badge-type.exercice {
+            background: #fff3e0;
+            color: #bf360c;
+        }
+        .ressource-item h4 {
+            font-size: 15px;
+            margin: 4px 0 2px;
+        }
+        .ressource-item h4 i {
+            margin-right: 6px;
+            color: var(--rouge);
+        }
+        .ressource-item .description {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .ressource-item .contenu-cache,
+        .ressource-item .corrige-cache {
+            display: none;
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            border: 1px dashed #ccc;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .ressource-item .contenu-cache.ouvert {
+            display: block;
+        }
+        .ressource-item .corrige-cache.ouvert {
+            display: block;
+            background: #e8f5e9;
+            border-left: 6px solid var(--vert);
+        }
+        .ressource-item .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .btn-ressource {
+            background: var(--noir);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-ressource.voir {
+            background: var(--rouge);
+        }
+        .btn-ressource.voir:hover {
+            background: #a32222;
+        }
+        .btn-ressource.corriger {
+            background: var(--jaune);
+            color: var(--noir);
+        }
+        .btn-ressource.corriger:hover {
+            background: #dba40a;
+        }
+        .btn-ressource.telecharger {
+            background: var(--vert);
+        }
+        .btn-ressource.telecharger:hover {
+            background: #007a3a;
+        }
+
+        /* ---------- TOAST ---------- */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background: var(--noir);
+            color: white;
+            text-align: center;
+            border-radius: 30px;
+            padding: 14px 20px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-weight: 600;
+            box-shadow: var(--ombre);
+            transition: 0.3s;
+            opacity: 0;
+            border-left: 6px solid var(--jaune);
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 40px;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 600px) {
+            .accordion-classe > .titre-classe {
+                font-size: 16px;
+                padding: 14px 16px;
+            }
+            .ressource-item .entete-ressource {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <i class="fas fa-graduation-cap"></i> Programme officiel du Burkina Faso <i class="fas fa-circle" style="font-size:5px; vertical-align:middle;"></i> 
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-book-open"></i> Burkina <span>Scolaire</span><small>CP1 · CP2 · CE1 · CE2 · CM1 · CM2</small>
+        </div>
+        <div class="header-actions">
+            <i class="fas fa-print" onclick="window.print()" title="Imprimer la page"></i>
+            <i class="fas fa-info-circle" onclick="showToast('📘 Tous les cours et exercices sont disponibles librement. Bonne révision !')" title="À propos"></i>
+        </div>
+    </header>
+
+    <!-- CONTENEUR ACCORDÉON -->
+    <div class="container-accordion" id="accordionContainer">
+        <!-- Généré par JavaScript -->
+    </div>
+
+    <!-- SECTION CONSEILS PARENTS -->
+    <div style="max-width:1100px; margin: 0 auto 30px; padding:0 16px;">
+        <div style="background:var(--noir); color:white; padding:22px 18px; border-radius:var(--arrondi); border-bottom:6px solid var(--jaune);">
+            <h3><i class="fas fa-lightbulb" style="color:var(--jaune); margin-right:10px;"></i> Conseils pour les parents</h3>
+            <p>Aidez vos enfants à réviser même sans connexion : ouvrez les cours, prenez une capture d'écran ou imprimez-les dans un cybercafé de la rue de la Gare.</p>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;">
+                <span style="background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:13px; font-weight:600;"><i class="fas fa-clock" style="color:var(--jaune); margin-right:6px;"></i> 30 min de révision par jour</span>
+                <span style="background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:13px; font-weight:600;"><i class="fas fa-pencil-alt" style="color:var(--jaune); margin-right:6px;"></i> Faire les exercices sur ardoise</span>
+                <span style="background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:13px; font-weight:600;"><i class="fas fa-users" style="color:var(--jaune); margin-right:6px;"></i> Groupe d'étude entre voisins</span>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align:center; padding:20px 16px; font-size:12px; color:#888; border-top:1px solid #ddd; margin:0 16px;">
+        <div style="display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-bottom:6px;">
+            <a onclick="showToast('📚 Basé sur le MENAPLN (Burkina Faso)')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-check-circle"></i> MENAPLN</a>
+            <a onclick="showToast('📍 Dédougou, Boucle du Mouhoun')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-map-pin"></i> Dédougou</a>
+            <a onclick="showToast('📧 Contactez-nous pour ajouter vos cours !')" style="color:var(--rouge); text-decoration:none; font-weight:600; cursor:pointer;"><i class="fas fa-envelope"></i> Contribuer</a>
+        </div>
+        <p>&copy; 2026 Burkina Scolaire · Entièrement gratuit pour les écoles de Dédougou</p>
+    </footer>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ======================================================================
+        // 1. BASE DE DONNÉES (20 cours + 20 exercices par classe)
+        // ======================================================================
+        const ressources = [];
+        let idCounter = 0;
+        function nextId() { return ++idCounter; }
+
+        const matieres = ['francais', 'maths', 'sciences', 'histoiregeo', 'civique'];
+        const classes = ['CP1', 'CP2', 'CE1', 'CE2', 'CM1', 'CM2'];
+
+        const themes = {
+            francais: {
+                CP1: ['Alphabet', 'Syllabes', 'Mots', 'Phrases simples', 'Lecture de mots', 'Écriture des lettres', 'Les voyelles', 'Les consonnes', 'Les sons [a], [i], [u]', 'Les sons [e], [o]'],
+                CP2: ['Lecture de phrases', 'Les pronoms personnels', 'Le présent des verbes', 'Le féminin et le pluriel', 'Les accords', 'Les contraires', 'Les synonymes', 'Les familles de mots', 'Le passé composé (découverte)', 'L\'imparfait (découverte)'],
+                CE1: ['Le nom', 'Le verbe', 'L\'adjectif', 'Le sujet', 'Le complément', 'Le présent', 'Le futur proche', 'Le passé composé', 'L\'imparfait', 'Les accords dans le groupe nominal'],
+                CE2: ['Le passé composé (approfondi)', 'L\'imparfait (approfondi)', 'Le plus-que-parfait', 'Les déterminants', 'Les prépositions', 'Les conjonctions', 'Les adverbes', 'Les phrases interrogatives', 'Les phrases exclamatives', 'Les phrases complexes'],
+                CM1: ['Le discours direct et indirect', 'La voix active et passive', 'Les modes (indicatif, impératif)', 'Le conditionnel', 'Le subjonctif (introduction)', 'L\'accord du participe passé', 'Les homophones', 'Les paronymes', 'Les figures de style (comparaison, métaphore)', 'La ponctuation avancée'],
+                CM2: ['Le discours rapporté', 'Les valeurs des temps', 'La concordance des temps', 'Les pronoms relatifs', 'Les propositions subordonnées', 'Les compléments circonstanciels', 'Les types de textes (narratif, descriptif)', 'Le lexique (mots savants)', 'L\'orthographe lexicale', 'La rédaction']
+            },
+            maths: {
+                CP1: ['Compter jusqu\'à 20', 'Additionner jusqu\'à 10', 'Soustraire jusqu\'à 10', 'Comparer des nombres', 'Les formes (cercle, carré)', 'Les longueurs (grand/petit)', 'Les masses (lourd/léger)', 'Les jours de la semaine', 'Les mois', 'Lire l\'heure'],
+                CP2: ['Compter jusqu\'à 100', 'Addition et soustraction (nombres <100)', 'Les dizaines et unités', 'La multiplication (introduction)', 'Les mesures (litre, kilo)', 'Le périmètre (introduction)', 'L\'heure et les durées', 'Les figures planes', 'Les solides (cube, pavé)', 'Les problèmes simples'],
+                CE1: ['Les nombres jusqu\'à 1000', 'Les additions avec retenue', 'Les soustractions avec emprunt', 'La multiplication (tables)', 'La division (introduction)', 'Les fractions simples', 'Les unités de mesure (mètre, litre, gramme)', 'Le périmètre (carré, rectangle)', 'L\'aire (introduction)', 'Les problèmes à plusieurs étapes'],
+                CE2: ['Les nombres jusqu\'à 100 000', 'Les quatre opérations', 'Les nombres décimaux', 'Les fractions (approfondi)', 'Les mesures (km, hg, dal)', 'Les aires (carré, rectangle, triangle)', 'Les volumes', 'Les graphiques', 'Les proportions', 'Les problèmes complexes'],
+                CM1: ['Les nombres entiers (jusqu\'au milliard)', 'Les opérations sur les décimaux', 'Les fractions (comparaison, addition)', 'Les pourcentages', 'Les mesures (vitesse, débit)', 'Les aires (disque, trapèze)', 'Les volumes (prisme, cylindre)', 'Les transformations (symétrie)', 'Les statistiques (moyenne)', 'Les équations simples'],
+                CM2: ['Les nombres rationnels', 'Les puissances', 'Les racines carrées', 'Les opérations combinées', 'Les proportions (règle de trois)', 'Les échelles', 'Les fonctions linéaires', 'Les probabilités', 'Les suites numériques', 'Les problèmes de logique']
+            },
+            sciences: {
+                CP1: ['Les cinq sens', 'Les parties du corps', 'Les aliments', 'Les saisons', 'L\'eau', 'Le soleil', 'Les plantes', 'Les animaux (petits)', 'La maison', 'Les vêtements'],
+                CP2: ['Le corps humain (squelette, muscles)', 'L\'alimentation (équilibre)', 'Les états de l\'eau', 'Le cycle de l\'eau', 'Les plantes (parties, fonctions)', 'Les animaux (classification)', 'Les habitats', 'Les saisons et le climat', 'Les déchets', 'L\'énergie (soleil, vent)'],
+                CE1: ['Les organes (cœur, poumons)', 'La digestion', 'La respiration', 'La circulation sanguine', 'Le squelette', 'Les muscles', 'Les sens (approfondi)', 'Les plantes (photosynthèse)', 'Les chaînes alimentaires', 'Les milieux de vie'],
+                CE2: ['Le système nerveux', 'Les sens (vue, ouïe, toucher, odorat, goût)', 'Les énergies renouvelables', 'Les énergies non renouvelables', 'Les déchets et le recyclage', 'Les volcans et séismes', 'Les roches', 'Les fossiles', 'L\'évolution des espèces', 'La reproduction des plantes'],
+                CM1: ['Les cellules', 'Les micro-organismes', 'Les maladies et l\'hygiène', 'Les systèmes (digestif, respiratoire, circulatoire)', 'Les hormones', 'La génétique (introduction)', 'Les écosystèmes', 'Les biomes', 'La biodiversité', 'L\'impact de l\'homme'],
+                CM2: ['Les atomes et molécules', 'Les réactions chimiques', 'Les acides et bases', 'Les circuits électriques', 'Les forces et mouvements', 'Les machines simples', 'Les ondes (son, lumière)', 'Les planètes', 'Les satellites', 'L\'exploration spatiale']
+            },
+            histoiregeo: {
+                CP1: ['La famille', 'L\'école', 'Le village', 'Les métiers', 'Les lieux (marché, mosquée, église)', 'Les moyens de transport', 'Les fêtes', 'Les saisons', 'Les cultures', 'Les animaux domestiques'],
+                CP2: ['Les parents et les ancêtres', 'Les ethnies du Burkina', 'Les villages et les villes', 'Les monuments (statue de la femme)', 'Les fleuves (Mouhoun, Nakambé)', 'Les productions agricoles (maïs, coton)', 'Les moyens de déplacement', 'Les marchés', 'Les jours de fête', 'Les héros locaux'],
+                CE1: ['Les régions du Burkina (Boucle du Mouhoun, etc.)', 'Les provinces', 'Les symboles (drapeau, armoiries)', 'Les grands hommes (Thomas Sankara)', 'Les dates importantes (5 août, 4 août)', 'Les pays voisins', 'Les reliefs', 'Les climats', 'Les habitats', 'Les métiers traditionnels'],
+                CE2: ['Les royaumes anciens (Ouagadougou, Yatenga)', 'La colonisation', 'L\'indépendance (1960)', 'Les institutions (président, assemblée)', 'Les collectivités territoriales', 'Les ressources naturelles (or, manganèse)', 'Les industries', 'Les transports (train, avion)', 'Les communications (radio, téléphone)', 'Les défis du développement'],
+                CM1: ['Les grandes civilisations (Afrique de l\'Ouest)', 'Les empires (Ghana, Mali, Songhaï)', 'La traite négrière', 'La colonisation en Afrique', 'Les indépendances', 'Les conflits en Afrique', 'Les organisations internationales (UA)', 'La mondialisation', 'Les flux migratoires', 'Les enjeux de l\'eau'],
+                CM2: ['Les guerres mondiales et leur impact en Afrique', 'Les idéologies (socialisme, capitalisme)', 'Le néocolonialisme', 'Les défis contemporains (terrorisme, changement climatique)', 'Les accords de Paris', 'Le développement durable', 'Les droits de l\'homme', 'Les médias', 'La citoyenneté européenne', 'Les relations internationales']
+            },
+            civique: {
+                CP1: ['Vivre ensemble', 'Le respect', 'La politesse', 'L\'honnêteté', 'Le partage', 'L\'entraide', 'L\'écoute', 'La propreté', 'Les règles de la classe', 'La cour de récréation'],
+                CP2: ['Les droits de l\'enfant', 'Les devoirs de l\'élève', 'La charte de l\'école', 'Le rôle du maître', 'Le rôle des parents', 'Les institutions (mairie, préfecture)', 'Les élections', 'Les symboles (drapeau, hymne)', 'Les fêtes nationales', 'La solidarité'],
+                CE1: ['La constitution du Burkina', 'Les droits fondamentaux', 'Les devoirs du citoyen', 'Les institutions (gouvernement, parlement)', 'Les services publics (hôpital, école)', 'Les impôts', 'La protection sociale', 'Les associations', 'Les ONG', 'La participation citoyenne'],
+                CE2: ['La démocratie', 'Les partis politiques', 'Les élections locales et nationales', 'Le rôle du président', 'Le rôle du premier ministre', 'Le conseil des ministres', 'La justice (tribunaux)', 'Les forces de sécurité', 'Les médias et la liberté d\'expression', 'La laïcité'],
+                CM1: ['Les droits de l\'homme', 'La Convention de Genève', 'Les organisations internationales (ONU)', 'L\'Union africaine', 'La CEDEAO', 'Les Objectifs du Millénaire', 'Les ODD', 'Les migrations', 'Les réfugiés', 'Les mineurs isolés'],
+                CM2: ['La philosophie des Lumières', 'Les grands penseurs (Rousseau, Locke)', 'Les révolutions (française, américaine)', 'Les droits civiques (MLK)', 'Les luttes féministes', 'Les syndicats', 'Les médias sociaux et la citoyenneté numérique', 'La désinformation', 'Les fake news', 'L\'éco-citoyenneté']
+            }
+        };
+
+        // Génération des 240 ressources (20 cours + 20 exercices par classe)
+        classes.forEach(classe => {
+            // 20 cours
+            for (let i = 0; i < 20; i++) {
+                const mat = matieres[i % matieres.length];
+                const themeList = themes[mat] && themes[mat][classe] ? themes[mat][classe] : ['Thème générique'];
+                const theme = themeList[i % themeList.length];
+                const titre = `Cours ${i+1} : ${theme}`;
+                const description = `Cours de ${mat} - ${classe} - Thème : ${theme}`;
+                const contenu = `📘 <strong>${titre}</strong><br><br>
+                ${theme} est un sujet important en ${mat}. Dans ce cours, nous allons découvrir les bases.
+                <br><br>
+                <strong>Objectif :</strong> Comprendre les notions essentielles de ${theme.toLowerCase()}.
+                <br>
+                <strong>Exemples :</strong> Des exemples concrets issus de la vie quotidienne au Burkina Faso.
+                <br>
+                <strong>À retenir :</strong> Retiens les définitions et les exercices pratiques.`;
+                ressources.push({
+                    id: nextId(),
+                    classe: classe,
+                    matiere: mat,
+                    type: 'cours',
+                    titre: titre,
+                    description: description,
+                    contenu: contenu
+                });
+            }
+            // 20 exercices avec corrigés
+            for (let i = 0; i < 20; i++) {
+                const mat = matieres[(i+2) % matieres.length];
+                const themeList = themes[mat] && themes[mat][classe] ? themes[mat][classe] : ['Exercice générique'];
+                const theme = themeList[(i*3) % themeList.length];
+                const titre = `Exercice ${i+1} : ${theme}`;
+                const description = `Exercice de ${mat} - ${classe} - ${theme}`;
+                const contenu = `📝 <strong>${titre}</strong><br><br>
+                ${theme} : réponds aux questions suivantes.
+                <br>
+                1. Question 1 sur ${theme} ?<br>
+                2. Question 2 sur ${theme} ?<br>
+                3. Question 3 sur ${theme} ?<br>
+                4. Applique la règle à un exemple de la vie courante.`;
+                const corrige = `✅ <strong>Corrigé de l'exercice "${titre}"</strong><br>
+                1. Réponse correcte à la question 1.<br>
+                2. Réponse correcte à la question 2.<br>
+                3. Réponse correcte à la question 3.<br>
+                4. Exemple d'application corrigé.`;
+                ressources.push({
+                    id: nextId(),
+                    classe: classe,
+                    matiere: mat,
+                    type: 'exercice',
+                    titre: titre,
+                    description: description,
+                    contenu: contenu,
+                    corrige: corrige
+                });
+            }
+        });
+
+        // ======================================================================
+        // 2. GÉNÉRATION DE L'ACCORDÉON (100% PUBLIC)
+        // ======================================================================
+        function genererAccordeon() {
+            const container = document.getElementById('accordionContainer');
+            const grouped = {};
+            classes.forEach(cl => grouped[cl] = {});
+            ressources.forEach(r => {
+                if (!grouped[r.classe]) grouped[r.classe] = {};
+                if (!grouped[r.classe][r.matiere]) grouped[r.classe][r.matiere] = [];
+                grouped[r.classe][r.matiere].push(r);
+            });
+
+            let html = '';
+            classes.forEach(cl => {
+                const matieresObj = grouped[cl] || {};
+                const totalRessources = Object.values(matieresObj).reduce((acc, arr) => acc + arr.length, 0);
+                html += `
+                    <div class="accordion-classe" data-classe="${cl}">
+                        <div class="titre-classe" onclick="toggleClasse(this)">
+                            <span><i class="fas fa-chevron-right"></i> <i class="fas fa-graduation-cap"></i> ${cl}</span>
+                            <span class="badge-count">${totalRessources} ressources</span>
+                        </div>
+                        <div class="contenu-classe">
+                `;
+                const matiereList = ['francais', 'maths', 'sciences', 'histoiregeo', 'civique'];
+                matiereList.forEach(mat => {
+                    const items = matieresObj[mat] || [];
+                    if (items.length === 0) return;
+                    const matIcon = {
+                        francais: 'fa-pen-fancy',
+                        maths: 'fa-calculator',
+                        sciences: 'fa-flask',
+                        histoiregeo: 'fa-globe-africa',
+                        civique: 'fa-handshake'
+                    }[mat] || 'fa-book';
+                    const matLabel = {
+                        francais: 'Français',
+                        maths: 'Maths',
+                        sciences: 'Sciences',
+                        histoiregeo: 'Histoire/Géo',
+                        civique: 'Éduc. civique'
+                    }[mat] || mat;
+
+                    html += `
+                        <div class="accordion-matiere" data-matiere="${mat}">
+                            <div class="titre-matiere" onclick="toggleMatiere(this)">
+                                <span><i class="fas ${matIcon}"></i> ${matLabel}</span>
+                                <span class="badge-count">${items.length}</span>
+                            </div>
+                            <div class="contenu-matiere">
+                    `;
+                    items.forEach(r => {
+                        const typeClass = r.type === 'cours' ? 'cours' : 'exercice';
+                        const typeIcon = r.type === 'cours' ? 'fa-book' : 'fa-pencil-alt';
+                        const hasCorrige = r.corrige ? true : false;
+                        const contentId = `content-${r.id}`;
+                        const corrigeId = `corrige-${r.id}`;
+
+                        html += `
+                            <div class="ressource-item">
+                                <div class="entete-ressource">
+                                    <span class="badge-type ${typeClass}"><i class="fas ${typeIcon}"></i> ${r.type.charAt(0).toUpperCase() + r.type.slice(1)}</span>
+                                </div>
+                                <h4><i class="fas ${typeIcon}"></i> ${r.titre}</h4>
+                                <div class="description">${r.description}</div>
+                                <div class="contenu-cache" id="${contentId}">${r.contenu}</div>
+                                ${hasCorrige ? `<div class="corrige-cache" id="${corrigeId}">${r.corrige}</div>` : ''}
+                                <div class="actions">
+                                    <button class="btn-ressource voir" onclick="toggleContenu('${contentId}', this)"><i class="fas fa-eye"></i> Voir le contenu</button>
+                                    ${hasCorrige ? `<button class="btn-ressource corriger" onclick="toggleCorrige('${corrigeId}', this)"><i class="fas fa-check-circle"></i> Voir corrigé</button>` : ''}
+                                    <button class="btn-ressource telecharger" onclick="showToast('📥 Téléchargement PDF (simulé) - ${r.titre}')"><i class="fas fa-download"></i> PDF</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ======================================================================
+        // 3. FONCTIONS DE TOGGLE
+        // ======================================================================
+        function toggleClasse(element) {
+            const accordion = element.closest('.accordion-classe');
+            accordion.classList.toggle('open');
+            const icon = element.querySelector('.fa-chevron-right');
+            if (icon) icon.style.transform = accordion.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+
+        function toggleMatiere(element) {
+            const accordion = element.closest('.accordion-matiere');
+            accordion.classList.toggle('open');
+        }
+
+        function toggleContenu(id, bouton) {
+            const div = document.getElementById(id);
+            if (!div) return;
+            div.classList.toggle('ouvert');
+            bouton.innerHTML = div.classList.contains('ouvert') ?
+                '<i class="fas fa-eye-slash"></i> Masquer' :
+                '<i class="fas fa-eye"></i> Voir le contenu';
+        }
+
+        function toggleCorrige(id, bouton) {
+            const div = document.getElementById(id);
+            if (!div) return;
+            div.classList.toggle('ouvert');
+            bouton.innerHTML = div.classList.contains('ouvert') ?
+                '<i class="fas fa-check-circle"></i> Masquer corrigé' :
+                '<i class="fas fa-check-circle"></i> Voir corrigé';
+            if (div.classList.contains('ouvert')) {
+                div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ======================================================================
+        // 4. TOAST
+        // ======================================================================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ======================================================================
+        // 5. INIT
+        // ======================================================================
+        genererAccordeon();
+
+        // Message de bienvenue après le chargement
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                showToast('📚 Bienvenue ! Ouvre une classe pour commencer à réviser.');
+            }, 600);
+        });
+
+        // Rendre les fonctions globales pour les onclick
+        window.toggleClasse = toggleClasse;
+        window.toggleMatiere = toggleMatiere;
+        window.toggleContenu = toggleContenu;
+        window.toggleCorrige = toggleCorrige;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
